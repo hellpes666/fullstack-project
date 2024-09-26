@@ -1,12 +1,13 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-t9in:h0c9.V2=w2>
+import dotenv from "dotenv";
+
 //? URL from https://cloud.mongodb.com/
+//? use dotenv for security passwords
+dotenv.config();
 mongoose
-    .connect(
-        "mongodb+srv://admin:<pass>@fullstack-app-blog.6znmk.mongodb.net/?retryWrites=true&w=majority&appName=fullstack-app-BLOG"
-    )
+    .connect(process.env.MONGODB_URI)
     .then(() => console.log("DB ok"))
     .catch((err) => console.log("DB error", err));
 

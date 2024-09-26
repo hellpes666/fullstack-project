@@ -2,21 +2,21 @@
 
 ## Frontend
 
-- ReactJS v18>
-- Redux Toolkit
-- React Hook Form
-- React Router v6>
-- React MD / Simple Editor
-- Axios over fetch
+-   ReactJS v18>
+-   Redux Toolkit
+-   React Hook Form
+-   React Router v6>
+-   React MD / Simple Editor
+-   Axios over fetch
 
 ## Backend
 
-- NodeJS (ES 6)
-- Express + validator
-- MongoDB / Mongoose
-- JWT Auth
-- Multer (upload data)
-- BCrypt (cypher pass)
+-   NodeJS (ES 6) (nodemon library for uninterrupted server operation )
+-   Express + validator
+-   MongoDB / Mongoose
+-   JWT Auth (JSON Web Token) - checkout encode token -> https://jwt.io/
+-   Multer (upload data)
+-   BCrypt (Password encryption)
 
 | _Method_              | _Action_                        |
 | --------------------- | ------------------------------- |
