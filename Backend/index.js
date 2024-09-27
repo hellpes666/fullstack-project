@@ -20,30 +20,103 @@ const app = express();
 //? Now we can get JSON from body request
 app.use(express.json());
 
-app.post("/auth/register", registerValidation, async (req, res) => {
-    const errors = validationResult(req);
+app.post("/auth/login", async (req, res) => {
+    try {
+        const user = await UserSchema.findOne({ email: req.body.email });
 
-    if (!errors.isEmpty()) {
-        return res.status(400).json(errors.array());
+        if (!user) {
+            return res.status(404).json({
+                //? Лучше писать: "Неверный логин или пароль (для безопасности)"
+                message: "Пользователь не найден",
+            });
+        }
+
+        const isValidPassword = await bcrypt.compare(
+            req.body.password,
+            user._doc.passwordHash
+        );
+        if (!isValidPassword) {
+            return res.status(400).json({
+                message: "Неверный логин или пароль",
+            });
+        }
+
+        const token = jwt.sign(
+            {
+                _id: user._id,
+            },
+            "secret123",
+            {
+                expiresIn: "30d", //? Жизненный цикл токена
+            }
+        );
+
+        const { passwordHash, ...userData } = user._doc;
+        res.json({
+            ...userData,
+            token,
+        });
+    } catch (err) {
+        //? for dev:
+        console.log(err);
+
+        //?for user:
+        res.status(500).json({
+            message: "Не удалось авторизоваться",
+        });
     }
+});
 
-    //? Зашифровка пароля
-    const password = req.body.password;
-    const salt = await bcrypt.genSalt(10); //? Алгоритм шифрования
-    const passwordHash = await bcrypt.hash(password, salt); //? Пароль, алгоритм шифрования пароля
+app.post("/auth/register", registerValidation, async (req, res) => {
+    try {
+        const errors = validationResult(req);
 
-    //? Create a new model User
-    const doc = new UserSchema({
-        email: req.body.email,
-        passwordHash,
-        fullName: req.body.fullName,
-        avatarURL: req.body.avatarURL,
-    });
+        if (!errors.isEmpty()) {
+            return res.status(400).json(errors.array());
+        }
 
-    //? Create a User
-    const user = await doc.save(); //? Save to DB and return to const user
+        //? Зашифровка пароля
+        const password = req.body.password;
+        const salt = await bcrypt.genSalt(10); //? Алгоритм шифрования
+        const hash = await bcrypt.hash(password, salt); //? Пароль, алгоритм шифрования пароля
 
-    res.json(user);
+        //? Create a new model User
+        const doc = new UserSchema({
+            email: req.body.email,
+            passwordHash: hash,
+            fullName: req.body.fullName,
+            avatarURL: req.body.avatarURL,
+        });
+
+        //? Create a User
+        const user = await doc.save(); //? Save to DB and return to const user
+
+        const token = jwt.sign(
+            {
+                _id: user._id,
+            },
+            "secret123",
+            {
+                expiresIn: "30d", //? Жизненный цикл токена
+            }
+        );
+
+        const { passwordHash, ...userData } = user._doc;
+
+        //! Return only 1 answer
+        res.json({
+            ...userData,
+            token,
+        });
+    } catch (err) {
+        //? for dev:
+        console.log(err);
+
+        //?for user:
+        res.status(500).json({
+            message: "Не удалось зарегистрироваться",
+        });
+    }
 });
 
 const port = 4444;
