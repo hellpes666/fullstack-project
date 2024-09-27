@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import { registerValidation } from "./validations/auth.js";
 import { validationResult } from "express-validator";
 import UserSchema from "./models/User.js";
+import checkAuth from "./utils/checkAuth.js";
 
 //? URL from https://cloud.mongodb.com/
 //? use dotenv for security passwords
@@ -115,6 +116,29 @@ app.post("/auth/register", registerValidation, async (req, res) => {
         //?for user:
         res.status(500).json({
             message: "Не удалось зарегистрироваться",
+        });
+    }
+});
+
+//? About me section
+app.get("/auth/me", checkAuth, async (req, res) => {
+    try {
+        const user = await UserSchema.findById(req.userId);
+        if (!user) {
+            return res.status(404).message({
+                message: "Пользователь не найден",
+            });
+        }
+
+        const { passwordHash, ...userData } = user._doc;
+        res.json(userData);
+    } catch (err) {
+        //? for dev:
+        console.log(err);
+
+        //?for user:
+        res.status(500).json({
+            message: "Нет доступа",
         });
     }
 });
