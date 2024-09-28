@@ -2,7 +2,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import UserModel from "../models/User.js";
-import { validationResult } from "express-validator";
 import { errorStatusCodeMessage } from "./UserControllerErrors.js";
 
 const createAndSendUserData = (res, user) => {
@@ -25,12 +24,6 @@ const createAndSendUserData = (res, user) => {
 
 export const register = async (req, res) => {
     try {
-        const errors = validationResult(req);
-
-        if (!errors.isEmpty()) {
-            return res.status(400).json(errors.array());
-        }
-
         //? Зашифровка пароля
         const password = req.body.password;
         const salt = await bcrypt.genSalt(10); //? Алгоритм шифрования
