@@ -1,5 +1,5 @@
-export const errorStatusCodeMessage = (res, status, message) => {
-    return res.status(status).message({
-        message: message,
+export const errorStatusCodeMessage = (res, status, msg) => {
+    return res.status(status).json({
+        message: msg,
     });
 };

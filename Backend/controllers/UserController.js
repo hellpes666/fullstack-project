@@ -1,7 +1,7 @@
 //? User Controller
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import UserSchema from "../models/User.js";
+import UserModel from "../models/User.js";
 import { validationResult } from "express-validator";
 import { errorStatusCodeMessage } from "./UserControllerErrors.js";
 
@@ -37,7 +37,7 @@ export const register = async (req, res) => {
         const hash = await bcrypt.hash(password, salt); //? Пароль, алгоритм шифрования пароля
 
         //? Create a new model User
-        const doc = new UserSchema({
+        const doc = new UserModel({
             email: req.body.email,
             passwordHash: hash,
             fullName: req.body.fullName,
@@ -59,7 +59,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        const user = await UserSchema.findOne({ email: req.body.email });
+        const user = await UserModel.findOne({ email: req.body.email });
 
         if (!user) {
             errorStatusCodeMessage(res, 404, "Пользователь не найден");
@@ -85,7 +85,7 @@ export const login = async (req, res) => {
 
 export const getMe = async (req, res) => {
     try {
-        const user = await UserSchema.findById(req.userId);
+        const user = await UserModel.findById(req.userId);
         if (!user) {
             errorStatusCodeMessage(res, 404, "Пользователь не найден");
         }
