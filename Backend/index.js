@@ -42,7 +42,7 @@ app.post("/posts", checkAuth, postCreateValidation, PostController.create);
 //? Delete Article
 app.delete("/posts/:id", checkAuth, PostController.remove);
 //? Update Article
-app.patch("/posts/:id", PostController.update);
+app.patch("/posts/:id", checkAuth, PostController.update);
 
 const port = 4444;
 
